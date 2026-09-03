@@ -46,4 +46,23 @@ class KatalogController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'Berhasil meminjam buku. Silakan ambil buku di perpustakaan.');
     }
+
+    public function kembali(Peminjaman $peminjaman)
+    {
+        if ($peminjaman->user_id !== auth()->id()) {
+            return back()->with('error', 'Anda tidak memiliki akses.');
+        }
+
+        if ($peminjaman->status === 'dipinjam') {
+            $peminjaman->update([
+                'status' => 'dikembalikan',
+            ]);
+
+            $peminjaman->buku->increment('stok');
+
+            return redirect()->route('dashboard')->with('success', 'Buku berhasil dikembalikan.');
+        }
+
+        return redirect()->route('dashboard')->with('error', 'Buku sudah dikembalikan sebelumnya.');
+    }
 }

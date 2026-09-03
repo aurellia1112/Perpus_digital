@@ -68,6 +68,7 @@
                             <th class="border border-gray-300 p-2">Tanggal Pinjam</th>
                             <th class="border border-gray-300 p-2">Batas Pengembalian</th>
                             <th class="border border-gray-300 p-2">Status</th>
+                            <th class="border border-gray-300 p-2">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -82,10 +83,21 @@
                                     {{ ucfirst($r->status) }}
                                 </span>
                             </td>
+                            <td class="border border-gray-300 p-2 text-center">
+                                @if($r->status === 'dipinjam')
+                                    <form action="{{ route('user.kembali', $r->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Yakin ingin mengembalikan buku ini?')">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1 rounded text-sm shadow">Kembalikan</button>
+                                    </form>
+                                @else
+                                    <span class="text-gray-400 text-sm">Selesai</span>
+                                @endif
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="border border-gray-300 p-4 text-center text-gray-500">Belum ada riwayat peminjaman buku.</td>
+                            <td colspan="6" class="border border-gray-300 p-4 text-center text-gray-500">Belum ada riwayat peminjaman buku.</td>
                         </tr>
                         @endforelse
                     </tbody>

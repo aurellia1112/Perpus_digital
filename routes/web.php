@@ -7,39 +7,92 @@ use App\Http\Controllers\Admin\PeminjamanController;
 use App\Http\Controllers\User\KatalogController;
 use Illuminate\Support\Facades\Route;
 
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+*/
+
+// Halaman awal
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Dashboard Siswa / User
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', [KatalogController::class, 'index'])->name('dashboard');
-    Route::post('/dashboard/pinjam', [KatalogController::class, 'store'])->name('user.pinjam');
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD SISWA
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:user'])->group(function () {
+
+    // Dashboard Siswa / Katalog
+    Route::get('/dashboard', [KatalogController::class, 'index'])
+        ->name('dashboard');
+
+    // Siswa melakukan peminjaman
+    Route::post('/dashboard/pinjam', [KatalogController::class, 'store'])
+        ->name('user.pinjam');
+
+    // Siswa melakukan pengembalian mandiri
+    Route::patch('/dashboard/kembali/{peminjaman}', [KatalogController::class, 'kembali'])
+        ->name('user.kembali');
 });
 
-// Area Admin
-Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    // Dashboard Admin
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| AREA ADMIN
+|--------------------------------------------------------------------------
+*/
 
-    // CRUD Buku
-    Route::resource('buku', BukuController::class);
+Route::middleware(['auth', 'role:admin'])
+    ->prefix('admin')
+    ->name('admin.')
+    ->group(function () {
 
-    // CRUD User
-    Route::resource('user', UserController::class);
+        // Dashboard Admin
+        Route::get('/dashboard', function () {
+            return view('admin.dashboard');
+        })->name('dashboard');
 
-    // CRUD Peminjaman
-    Route::resource('peminjaman', PeminjamanController::class);
-    Route::patch('peminjaman/{peminjaman}/kembali', [PeminjamanController::class, 'updateStatus'])->name('peminjaman.kembali');
-});
+        // Kelola Buku
+        Route::resource('buku', BukuController::class);
 
-// Profile
+        // Kelola Anggota
+        Route::resource('user', UserController::class);
+
+        // Kelola Peminjaman
+        Route::resource('peminjaman', PeminjamanController::class);
+
+        // Tandai peminjaman sebagai dikembalikan
+        Route::patch(
+            '/peminjaman/{peminjaman}/kembali',
+            [PeminjamanController::class, 'updateStatus']
+        )->name('peminjaman.kembali');
+    });
+
+/*
+|--------------------------------------------------------------------------
+| PROFILE
+|--------------------------------------------------------------------------
+*/
+
 Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+/*
+|--------------------------------------------------------------------------
+| AUTH
+|--------------------------------------------------------------------------
+*/
+
+require __DIR__ . '/auth.php';

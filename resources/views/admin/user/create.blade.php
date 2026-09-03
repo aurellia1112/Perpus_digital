@@ -51,7 +51,7 @@
                     <!-- Password -->
                     <div class="mb-4">
                         <label class="block font-medium text-sm text-gray-700">
-                            Password (Minimal 8 Karakter)
+                            Password
                         </label>
                         <input
                             type="password"
@@ -63,20 +63,6 @@
                         @error('password')
                             <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                         @enderror
-                    </div>
-
-                    <!-- Konfirmasi Password -->
-                    <div class="mb-4">
-                        <label class="block font-medium text-sm text-gray-700">
-                            Konfirmasi Password
-                        </label>
-                        <input
-                            type="password"
-                            name="password_confirmation"
-                            class="border-gray-300 rounded-md shadow-sm w-full"
-                            placeholder="••••••••"
-                            required
-                        >
                     </div>
 
                     <!-- Role -->

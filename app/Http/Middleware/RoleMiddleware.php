@@ -10,12 +10,21 @@ class RoleMiddleware
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string ...$roles): Response
-    {
-        if (! $request->user() || ! in_array($request->user()->role, $roles, true)) {
+    public function handle(
+        Request $request,
+        Closure $next,
+        string ...$roles
+    ): Response {
+        $user = $request->user();
+
+        // Jika belum login
+        if (! $user) {
+            abort(403, 'Akses ditolak. Anda harus login terlebih dahulu.');
+        }
+
+        // Pastikan user memiliki role yang valid
+        if (! in_array($user->role, $roles, true)) {
             abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengakses halaman ini.');
         }
 

@@ -28,12 +28,35 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        // Pengecekan Hak Akses (Role Redirect)
-        if (Auth::user()->role === 'admin') {
-            return redirect()->intended(route('admin.dashboard', absolute: false));
-        } else {
-            return redirect()->intended(route('dashboard', absolute: false));
+        $user = $request->user();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Redirect berdasarkan role
+        |--------------------------------------------------------------------------
+        */
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
         }
+
+        if ($user->role === 'user') {
+            return redirect()->route('dashboard');
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Role tidak dikenal
+        |--------------------------------------------------------------------------
+        */
+
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/')
+            ->with('error', 'Role akun tidak valid.');
     }
 
     /**

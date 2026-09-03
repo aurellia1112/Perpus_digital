@@ -34,6 +34,11 @@ class PeminjamanController extends Controller
             'tanggal_kembali' => 'required|date|after_or_equal:tanggal_pinjam',
         ]);
 
+        $user = User::findOrFail($request->user_id);
+        if ($user->isAdmin()) {
+            return back()->with('error', 'Peminjaman hanya dapat dilakukan untuk akun siswa / anggota.');
+        }
+
         $buku = Buku::findOrFail($request->buku_id);
 
         // Cek stok buku

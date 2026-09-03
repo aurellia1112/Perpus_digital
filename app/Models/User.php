@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,13 +9,10 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /**
-     * @use HasFactory<UserFactory>
-     */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Kolom yang boleh diisi.
      *
      * @var list<string>
      */
@@ -28,7 +24,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Kolom yang disembunyikan.
      *
      * @var list<string>
      */
@@ -38,8 +34,9 @@ class User extends Authenticatable
     ];
 
     /**
-     * Relasi ke tabel peminjaman
-     * (1 user bisa memiliki banyak transaksi peminjaman)
+     * Relasi ke tabel peminjaman.
+     *
+     * Satu user dapat memiliki banyak peminjaman.
      */
     public function peminjamans()
     {
@@ -47,9 +44,28 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
+     * Mengecek apakah user adalah Admin.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Mengecek apakah user adalah Siswa / Anggota.
+     */
+    public function isSiswa(): bool
+    {
+        return in_array($this->role, ['user', 'siswa'], true);
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === 'user';
+    }
+
+    /**
+     * Attribute casting.
      */
     protected function casts(): array
     {
